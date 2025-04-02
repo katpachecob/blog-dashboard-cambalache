@@ -44,15 +44,6 @@ export default function Dashboard() {
           category: "technology",
           isPublished: true,
         },
-        {
-          id: "2",
-          title: "The Power of Tailwind CSS",
-          content:
-            "Tailwind CSS is a utility-first CSS framework that allows you to build custom designs without leaving your HTML...",
-          createdAt: new Date().toISOString(),
-          category: "technology",
-          isPublished: true,
-        },
       ]
       setBlogs(exampleBlogs)
       localStorage.setItem("blogs", JSON.stringify(exampleBlogs))
@@ -80,16 +71,16 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Your Blogs</h1>
+        <h1 className="text-3xl font-bold">Tus Publicaciones</h1>
         <Button onClick={() => router.push("/dashboard/new-blog")} className="flex items-center gap-2">
           <PlusCircle className="h-4 w-4" />
-          <span>Nuevo blog</span>
+          <span>Nueva publicación</span>
         </Button>
       </div>
 
       {blogs.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">You don't have any blogs yet. Create your first one!</p>
+          <p className="text-muted-foreground">No tienes ninguna publicación. Crea tu primera publicación!</p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +113,7 @@ export default function Dashboard() {
                   onClick={() => handleEditBlog(blog.id)}
                 >
                   <Edit className="h-4 w-4" />
-                  <span>Edit</span>
+                  <span>Editar</span>
                 </Button>
                 <Button
                   variant="destructive"
@@ -131,7 +122,7 @@ export default function Dashboard() {
                   onClick={() => handleDeleteBlog(blog.id)}
                 >
                   <Trash2 className="h-4 w-4" />
-                  <span>Delete</span>
+                  <span>Eliminar</span>
                 </Button>
               </CardFooter>
             </Card>

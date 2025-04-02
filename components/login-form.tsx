@@ -1,49 +1,35 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { login } from "@/app/login/actions"
+import { useRouter } from "next/navigation"
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
-    // Simple validation
-    if (!email || !password) {
-      setError("Please enter both email and password")
-      setIsLoading(false)
-      return
-    }
-
-    // Mock authentication - in a real app, you would validate against a backend
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // For demo purposes, any email/password combination works
-      // In a real app, you would verify credentials with your backend
-
-      // Store some user info in localStorage (for demo purposes only)
-      localStorage.setItem("user", JSON.stringify({ email }))
-
-      // Redirect to dashboard
-      router.push("/dashboard")
+      const result = await login(e.currentTarget.email.value, e.currentTarget.password.value)
+      if (result?.error) {
+        setError(result.error)
+      }
+      else{
+        localStorage.setItem('user', JSON.stringify(result.data))
+        router.push('/dashboard')
+      }
     } catch (err) {
-      setError("Failed to login. Please try again.")
+      setError("An unexpected error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -62,10 +48,9 @@ export default function LoginForm() {
         <Label htmlFor="email">Email</Label>
         <Input
           id="email"
+          name="email"
           type="email"
           placeholder="you@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
         />
       </div>
@@ -73,23 +58,18 @@ export default function LoginForm() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">Password</Label>
-          <a href="#" className="text-sm text-primary hover:underline">
-            Forgot password?
-          </a>
         </div>
-        <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <Input 
+          id="password" 
+          name="password"
+          type="password" 
+          required 
+        />
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Login"}
       </Button>
-
-      <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <a href="#" className="text-primary hover:underline">
-          Sign up
-        </a>
-      </div>
     </form>
   )
 }
