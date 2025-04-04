@@ -3,22 +3,42 @@ import { Repository } from "./repository";
 
 export class Service {
     static async getAll() {
-        return await Repository.getAll();
+        const { data, error } = await Repository.getAll();
+        if (error) {
+            return { error: error };
+        }
+        return data
     }
     
     static async getById(id: number) {
-        return await Repository.getById(id);
+        const { data, error } = await Repository.getById(id);
+        if (error) {
+            return { error: error };
+        }
+        return data
     }
     
     static async post(data: IBlog) {
-        return await Repository.post(data);
+        const { data: newData, error } = await Repository.post(data);
+        if (error) {
+            return { error: error };
+        }
+        return newData
     }
     
     static async delete(id: number) {
-        return await Repository.delete(id);
+        const { data, error } = await Repository.delete(id);
+        if (error) {
+            return { error: error };
+        }
+        return data
     }
     
     static async update(data: IBlog) {
-        return await Repository.update(data);
+        const { data: updatedData, error } = await Repository.update(data);
+        if (error) {
+            return { error: error };
+        }
+        return updatedData
     }
 }

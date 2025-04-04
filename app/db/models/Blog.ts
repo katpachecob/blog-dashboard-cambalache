@@ -4,7 +4,7 @@ export interface IBlog{
     date: Date;
     title: string;
     content: string;
-    categry: string;
+    category: string;
     isPublished: boolean;
     featuredImage: string;
 }
