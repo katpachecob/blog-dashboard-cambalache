@@ -26,7 +26,7 @@ export class Service {
       imageUrl = await uploadImage(data.featuredImage, fileName);
     }
     const blogData: IBlog = {
-      id: 0,
+      id: data.id,
       title: data.title,
       content: data.content,
       category: data.category,
