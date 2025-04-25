@@ -19,12 +19,14 @@ export class Service {
     return data;
   }
 
-  static async post(data: IBlog & { featuredImage: File }) {
-    let imageUrl = "";
+  static async post(data: IBlog & { featuredImage: any }) {
+    let imageUrl = '';
+    
     if (data.featuredImage) {
       const fileName = `blog-${Date.now()}-${data.title}`;
-      imageUrl = await uploadImage(data.featuredImage, fileName);
+      imageUrl = await uploadImage(data.featuredImage, fileName); 
     }
+  
     const blogData: IBlog = {
       id: data.id,
       title: data.title,
@@ -32,14 +34,16 @@ export class Service {
       category: data.category,
       date: data.date,
       isPublished: data.isPublished,
-      featuredImage: imageUrl,
+      featuredImage: imageUrl, 
     };
-
+  
     const { data: newData, error } = await Repository.post(blogData);
+    
     if (error) {
-      return { error: error };
+      return { error: error }; 
     }
-    return newData;
+  
+    return newData; 
   }
 
   static async delete(id: number) {
