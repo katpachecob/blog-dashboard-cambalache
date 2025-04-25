@@ -62,6 +62,7 @@ export class Service {
       imageUrl = await uploadImage(data.featuredImage, fileName);
     }
 
+    if (!data.id) return { error: "ID is required" };
     const { data: existingBlog, error } = await Repository.getById(data.id);
     if (error || !existingBlog) return { error: "Blog no encontrado" };
 

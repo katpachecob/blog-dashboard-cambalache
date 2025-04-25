@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Service } from "./service";
-import formidable from 'formidable';
+import { IBlog } from "@/app/db/models/Blog";
 
-
-const form = formidable({
-  uploadDir: '../../../public/uploads',
-  keepExtensions: true,   
-
-});
 
 
 export class Controller {
@@ -27,46 +21,42 @@ export class Controller {
 
   static async post(request: NextRequest) {
     try {
-      const body = await request.blob();  
-      const buffer = await body.arrayBuffer();
-
-      const stream = Buffer.from(buffer);
-
-      const data = await new Promise<any>((resolve, reject) => {
-        form.parse(stream, (err: any, fields: any, files: any) => {
-          if (err) {
-            reject(err);
-          }
-          resolve({ fields, files });
-        });
-      });
-
-      const { fields, files } = data;
-      const { title, content, category, isPublished, date } = fields;
-      const featuredImage = files.featuredImage;
-
-      if (!featuredImage) {
-        return NextResponse.json({ error: 'No image uploaded' }, { status: 400 });
+      const formData = await request.formData()
+  
+      const title = formData.get("title") as string
+      const content = formData.get("content") as string
+      const category = formData.get("category") as string
+      const isPublished = formData.get("isPublished") === "true"
+  
+      const featuredImage = formData.get("featuredImage") as File | null
+  
+      if (!title || !content) {
+        return NextResponse.json({ error: "Título y contenido son obligatorios" }, { status: 400 })
       }
-
-      const blogData = {
-        id: 0,
+  
+      const blogData: IBlog & { featuredImage: any } = {
+        id: undefined, 
         title,
         content,
         category,
+        date: undefined,
         isPublished,
-        date,
-        featuredImage: featuredImage[0],
-      };
-
-      const result = await Service.post(blogData);
-      return NextResponse.json(result, { status: 201 });
-
+        featuredImage: featuredImage ? featuredImage.name : "",
+      }
+  
+      const result = await Service.post(blogData)
+  
+      if (result.error) {
+        return NextResponse.json({ error: result.error }, { status: 500 })
+      }
+  
+      return NextResponse.json({ success: true, data: result }, { status: 201 })
     } catch (error) {
-      console.error(error);
-      return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+      console.error("Error al procesar la solicitud:", error)
+      return NextResponse.json({ error: (error as Error).message }, { status: 500 })
     }
   }
+  
 
   static async patch(request: NextRequest) {
     try {
