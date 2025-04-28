@@ -52,8 +52,9 @@ export class Controller {
   
   static async patch(request: NextRequest) {
     try {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
       const data = await request.json();
-  
       const title = data.title || '';
       const content = data.content || '';
       const category = data.category || '';
@@ -62,7 +63,7 @@ export class Controller {
   
 
       const blogData: IBlog = {
-        id: data.id,  
+        id: Number(id),  
         title,
         content,
         category,

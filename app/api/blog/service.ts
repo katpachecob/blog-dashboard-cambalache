@@ -71,9 +71,9 @@ export class Service {
 
     const blogData: IBlog = {
       id: data.id,
-      title: data.title,
-      content: data.content,
-      category: data.category,
+      title: data.title || existingBlog.title,
+      content: data.content || existingBlog.content,
+      category: data.category || existingBlog.category,
       date: data.date || existingBlog.date, 
       isPublished: data.isPublished,
       featuredImage: imageUrl || existingBlog.featuredImage, 
