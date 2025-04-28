@@ -19,22 +19,23 @@ export class Service {
     return data;
   }
 
-  static async post(data: IBlog & { featuredImage: any }) {
-    let imageUrl = '';
+  static async post(data: IBlog , featuredImage: File | null) {
+    let imageUrl;
     
-    if (data.featuredImage) {
-      const fileName = `blog-${Date.now()}-${data.title}`;
-      imageUrl = await uploadImage(data.featuredImage, fileName); 
+    const fechaActual = new Date().toISOString().split('T')[0]
+    if (featuredImage) {
+      const fileName = `blog-${fechaActual}-${data.title}`;
+      imageUrl = await uploadImage(featuredImage, fileName); 
     }
   
     const blogData: IBlog = {
-      id: data.id,
+      id: undefined,
       title: data.title,
       content: data.content,
       category: data.category,
-      date: data.date,
+      date: new Date(),
       isPublished: data.isPublished,
-      featuredImage: imageUrl, 
+      featuredImage: imageUrl || '', 
     };
   
     const { data: newData, error } = await Repository.post(blogData);
@@ -54,15 +55,17 @@ export class Service {
     return data;
   }
 
-  static async update(data: IBlog & { featuredImage?: File }) {
-    let imageUrl = "";
+  static async update(data: IBlog, featuredImage: File | null) {
+    let imageUrl;
 
-    if (data.featuredImage) {
-      const fileName = `blog-${Date.now()}-${data.title}`;
-      imageUrl = await uploadImage(data.featuredImage, fileName);
+    const fechaActual = new Date().toISOString().split('T')[0]
+    if (featuredImage) {
+      const fileName = `blog-${fechaActual}-${data.title}`;
+      imageUrl = await uploadImage(featuredImage, fileName); 
     }
 
     if (!data.id) return { error: "ID is required" };
+
     const { data: existingBlog, error } = await Repository.getById(data.id);
     if (error || !existingBlog) return { error: "Blog no encontrado" };
 
@@ -71,15 +74,15 @@ export class Service {
       title: data.title,
       content: data.content,
       category: data.category,
-      date: data.date,
+      date: data.date || existingBlog.date, 
       isPublished: data.isPublished,
-      featuredImage: imageUrl || existingBlog.featuredImage,
+      featuredImage: imageUrl || existingBlog.featuredImage, 
     };
 
-    const { data: updated, error: updateError } = await Repository.update(
-      blogData
-    );
+    const { data: updated, error: updateError } = await Repository.update(blogData);
     if (updateError) return { error: updateError };
+
     return updated;
   }
+
 }

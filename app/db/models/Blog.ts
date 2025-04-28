@@ -6,6 +6,6 @@ export interface IBlog{
     content: string;
     category: string;
     isPublished: boolean;
-    featuredImage: string;
+    featuredImage?: string;
 }
 

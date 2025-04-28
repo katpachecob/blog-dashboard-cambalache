@@ -21,55 +21,74 @@ export class Controller {
 
   static async post(request: NextRequest) {
     try {
+    
       const formData = await request.formData()
-  
-      const title = formData.get("title") as string
-      const content = formData.get("content") as string
-      const category = formData.get("category") as string
-      const isPublished = formData.get("isPublished") === "true"
-  
-      const featuredImage = formData.get("featuredImage") as File | null
-  
-      if (!title || !content) {
-        return NextResponse.json({ error: "Título y contenido son obligatorios" }, { status: 400 })
-      }
-  
-      const blogData: IBlog & { featuredImage: any } = {
-        id: undefined, 
+      const title = formData.get('title')?.toString() || ''
+      const content = formData.get('content')?.toString() || ''
+      const category = formData.get('category')?.toString() || ''
+      const isPublished = formData.get('isPublished') === 'true'
+      const featuredImage = formData.get('featuredImage') as File
+      const blogData: IBlog = {
         title,
         content,
         category,
-        date: undefined,
         isPublished,
-        featuredImage: featuredImage ? featuredImage.name : "",
+        featuredImage: '',
       }
   
-      const result = await Service.post(blogData)
+      const hasImage = featuredImage ? featuredImage : null; 
+      const newBlog = await Service.post(blogData, hasImage )
   
-      if (result.error) {
-        return NextResponse.json({ error: result.error }, { status: 500 })
-      }
-  
-      return NextResponse.json({ success: true, data: result }, { status: 201 })
+      
+      return NextResponse.json(newBlog, { status: 201 })
     } catch (error) {
-      console.error("Error al procesar la solicitud:", error)
-      return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+      return NextResponse.json(
+        { message: error instanceof Error ? error.message : 'An unknown error occurred' },
+        { status: 400 }
+      )
     }
+  
   }
   
-
   static async patch(request: NextRequest) {
     try {
       const data = await request.json();
-      return NextResponse.json(await Service.update(data));
+  
+      const title = data.title || '';
+      const content = data.content || '';
+      const category = data.category || '';
+      const isPublished = data.isPublished;
+      const featuredImage = data.featuredImage || '';
+  
+
+      const blogData: IBlog = {
+        id: data.id,  
+        title,
+        content,
+        category,
+        isPublished,
+        featuredImage,
+      };
+  
+      const hasImage = featuredImage ? featuredImage : null;
+  
+      const updatedBlog = await Service.update(blogData, hasImage);
+  
+      return NextResponse.json(updatedBlog, { status: 200 });
     } catch (error) {
-      return NextResponse.json({ error: error }, { status: 400 });
+      return NextResponse.json(
+        { message: error instanceof Error ? error.message : 'An unknown error occurred' },
+        { status: 400 }
+      );
     }
   }
+
+      
   static async delete(request: NextRequest) {
     try {
-      const data = await request.json();
-      return NextResponse.json(await Service.delete(data.id));
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
+      return NextResponse.json(await Service.delete(Number(id)));
     } catch (error) {
       return NextResponse.json({ error: error }, { status: 400 });
     }
